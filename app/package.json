@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "confirm": "^0.1.1",
     "confirmed": "^2.3.2",
     "inquirer": "^8.0.0",
     "mysql": "^2.18.1"

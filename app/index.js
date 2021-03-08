@@ -2,18 +2,18 @@
 // (i) packages -----------------------------------------
 const inquirer = require('inquirer');
 const mysql = require('mysql');
-const confirmed = require('confirmed');
+
 // (ii) tables from MySQL
 let roleTable;
 let departmentTable;
 let employeeTable;
 
 // (ii) The Question Arrays for the various prompts -----------------------------------------
-const welcomeQuestions = [{ type: "list", message: "Welcome to Employee Tracker. What would you like to do?", name: "welcomeChoices", choices: [{ name: "View all employees", value: "viewEmployees" }, { name: "View all departments", value: "viewDepartments" }, { name: "View all roles", value: "viewRoles" }, { name: "Add employee", value: "addEmployee" }, { name: "Add department", value: "addDept" }, { name: "Add role", value: "addRole" }, { name: "Update role", value: "updateRole" }, { name: "Quit", value: "quit" }] }];
+const welcomeQuestions = [{ type: "list", message: "Welcome to Employee Tracker. What would you like to do?", name: "welcomeChoices", choices: [{ name: "View all employees", value: "viewEmployees" }, { name: "View all departments", value: "viewDepartments" }, { name: "View all roles", value: "viewRoles" }, { name: "Add employee", value: "addEmployee" }, { name: "Add department", value: "addDepartment" }, { name: "Add role", value: "addRole" }, { name: "Update role", value: "updateRole" }, { name: "Quit", value: "quit" }] }];
 const updateRoleQuestions = [{ type: "list", message: "For which employee would you like to update the role?", name: "empID", choices: employeeTable }, { type: "list", message: "What is the employee's new role?", name: "titleID", choices: roleTable }];
 const addRoleQuestions = [{ type: "input", message: "What is the name of the new employee role?", name: "title" }, { type: "input", message: "How much is the salary of the new role?", name: "salary" }, { type: "list", message: "In which department is the new role?", name: "id", choices: departmentTable }];
 const addEmployeeQuestions = [{ type: 'input', message: "What is the employee's first name?", name: "firstName", }, { type: "input", message: "What is the employee's last name?", name: "lastName", }, { type: "list", message: "What is the employee's title?", name: "title", choices: roleTable }, { type: "list", message: "Who is the employee's manager?", name: "manager", choices: employeeTable }];
-const addDepartmentQuestions = [{ type: "input", message: "What is the name of the new department?", name: "name" }];
+const addDepartmentQuestions = { type: "input", message: "What is the name of the new department?", name: "name" };
 
 
 // CONNECTION =========================================
@@ -86,10 +86,10 @@ const welcomeSwitchB = (option) => {
 }
 
 // (iii) The functions for switchboard -----------------------------------------
-function viewEmployees() {
-    connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function(error, response) {
+const viewEmployees = () => {
+    connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function(err, response) {
         console.table(response);
-        finishOrStartAgain();
+        welcomePrompt(welcomeQuestions);
     })
 }
 
@@ -102,7 +102,7 @@ const viewDepartments = () => {
 
 const viewRoles = () => {
     connection.query("SELECT * from role", (err, response) => {
-        console.table(response);
+        console.table(response)
     })
 }
 
@@ -114,10 +114,9 @@ const addEmployee = () => {
 }
 
 const addDepartmentPrompt = () => {
-    inquirer
-        .prompt(addDepartmentQuestions)
+    inquirer.prompt(addDepartmentQuestions)
         .then((response) => {
-            addDepartment(response);
+            addDepartment(response)
         })
 }
 
@@ -143,7 +142,7 @@ const addRole = (data) => {
     }, (err, res) => {
         if (err) throw err;
     });
-    finishOrStartAgain();
+    welcomePrompt(welcomeQuestions)
 }
 
 const updateRolePrompt = () => {
@@ -158,16 +157,7 @@ const updateRole = (data) => {
         (err, res) => {
             if (err) throw err;
         });
-    finishOrStartAgain();
-}
-
-const finishOrStartAgain = () => {
-    confirm("Would you like to continue?")
-        .then(function confirmed() {
-            welcomePrompt();
-        }, function cancelled() {
-            endConnection();
-        });
+    welcomePrompt(welcomeQuestions);
 }
 
 //  (iv) End connection -----------------------------------------
