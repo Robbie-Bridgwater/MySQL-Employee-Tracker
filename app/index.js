@@ -8,16 +8,16 @@ let roleTable;
 let departmentTable;
 let employeeTable;
 
-// (ii) question arrays -----------------------------------------
-const welcomeQuestions = { type: "list", message: "Welcome to Employee Tracker. What would you like to do?", name: "welcomeChoices", choices: [{ name: "View all employees", value: "viewEmployees" }, { name: "View all departments", value: "viewDepartments" }, { name: "View all roles", value: "viewRoles" }, { name: "Add employee", value: "addEmployee" }, { name: "Add department", value: "addDept" }, { name: "Add role", value: "addRole" }, { name: "Update role", value: "updateRole" }, { name: "Quit", value: "quit" }] }
+// (ii) The Question Arrays for the various prompts -----------------------------------------
+const welcomeQuestions = [{ type: "list", message: "Welcome to Employee Tracker. What would you like to do?", name: "welcomeChoices", choices: [{ name: "View all employees", value: "viewEmployees" }, { name: "View all departments", value: "viewDepartments" }, { name: "View all roles", value: "viewRoles" }, { name: "Add employee", value: "addEmployee" }, { name: "Add department", value: "addDept" }, { name: "Add role", value: "addRole" }, { name: "Update role", value: "updateRole" }, { name: "Quit", value: "quit" }] }];
 const updateRoleQuestions = [{ type: "list", message: "For which employee would you like to update the role?", name: "empID", choices: employeeTable }, { type: "list", message: "What is the employee's new role?", name: "titleID", choices: roleTable }];
 const addRoleQuestions = [{ type: "input", message: "What is the name of the new employee role?", name: "title" }, { type: "input", message: "How much is the salary of the new role?", name: "salary" }, { type: "list", message: "In which department is the new role?", name: "id", choices: departmentTable }];
 const addEmployeeQuestions = [{ type: 'input', message: "What is the employee's first name?", name: "firstName", }, { type: "input", message: "What is the employee's last name?", name: "lastName", }, { type: "list", message: "What is the employee's title?", name: "title", choices: roleTable }, { type: "list", message: "Who is the employee's manager?", name: "manager", choices: employeeTable }];
-const addDepartmentQuestions = { type: "input", message: "What is the name of the new department?", name: "name" };
+const addDepartmentQuestions = [{ type: "input", message: "What is the name of the new department?", name: "name" }];
 
 
 // CONNECTION =========================================
-// (i) create connection to database -----------------------------------------
+// (i) Create a connection to the database -----------------------------------------
 const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -27,7 +27,8 @@ const connection = mysql.createConnection({
 })
 
 // (ii) initialise MySQL connection -----------------------------------------
-// This also populates the showRoles/showDepartments/showEmployees global variables with the tables from MySQL
+// This connects to the MySQL database and populates the showRoles, showDepartments and showEmployees
+// global variables with the corresponding tables from MySQL
 connection.connect((err) => {
 
     if (err) throw err;
@@ -48,15 +49,15 @@ connection.connect((err) => {
 })
 
 // MAIN =========================================
-// (i) welcome prompt -----------------------------------------
+// (i) Start-up prompt -----------------------------------------
 const welcomePrompt = (welcomeQuestions) => {
     inquirer.prompt(welcomeQuestions).then((response) => {
-        choiceSwitchB(response.welcomeChoices)
+        welcomeSwitchB(response.welcomeChoices)
     })
 }
 
-// (ii) switchboard for welcome prompt -----------------------------------------
-const choiceSwitchB = (option) => {
+// (ii) The switchboard for the welcome prompt that will contain the various functions for the application -----------------------------------------
+const welcomeSwitchB = (option) => {
     switch (option) {
         case "viewEmployees":
             viewEmployees();
@@ -84,7 +85,7 @@ const choiceSwitchB = (option) => {
     }
 }
 
-// (iii) functions for switchboard -----------------------------------------
+// (iii) The functions for switchboard -----------------------------------------
 function viewEmployees() {
     connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;", function(error, response) {
         console.table(response);
@@ -169,7 +170,7 @@ const finishOrStartAgain = () => {
         });
 }
 
-//  (iv) end connection -----------------------------------------
+//  (iv) End connection -----------------------------------------
 const endConnection = () => {
     console.log("Thank you for using Employee Tracker, your connection has now been terminated.");
     connection.end();
