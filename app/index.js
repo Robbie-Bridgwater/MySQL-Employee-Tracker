@@ -1,7 +1,8 @@
-// NB/ IMPORTANT*** This app uses a circular dependency. It populates three variables (roleTable, departmentTable, employeeTable) and
-// exports these variables to an external file in "tableObj" at the bottom and then requires it in this file again.
-// In redeveloping this app you may need to move the question prompts into this file to remove this circular dependency.
-// However, for the purpose of this homework I believe this presents the code in a concise and more understandable way.
+// NB/ IMPORTANT*** This app uses circular dependencies. The index.js file populates three variables (roleTable, departmentTable, employeeTable) with
+// tables from the MySQL employeeDB database. It then exports these variables to the question files found at "./assets/js/questions/" through the object "tableObj" 
+// (found at the bottom of this file). This file then uses those questions again creating a circular dependency.
+// When redeveloping this app, if you would like to ammend this data pairing, you would need to move the question prompts into index.js.
+// However, for the purpose of this homework, I believe this presents the code in a more concise and understandable way.
 
 // DEPENDENCIES =========================================
 // (i) packages -----------------------------------------
