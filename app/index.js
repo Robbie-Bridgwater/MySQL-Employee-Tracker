@@ -1,29 +1,23 @@
-// NB/ IMPORTANT*** This app uses circular dependencies. The index.js file populates three variables (roleTable, departmentTable, employeeTable) with
-// tables from the MySQL employeeDB database. It then exports these variables to the question files found at "./assets/js/questions/" through the object "tableObj" 
-// (found at the bottom of this file). This file then uses those questions again creating a circular dependency.
-// When redeveloping this app, if you would like to ammend this data pairing, you would need to move the question prompts into index.js.
-// However, for the purpose of this homework, I believe this presents the code in a more concise and understandable way.
-
 // DEPENDENCIES =========================================
 // (i) packages -----------------------------------------
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const confirmed = require('confirmed');
-
-// (ii) question arrays -----------------------------------------
-const welcomeQuestions = require('./assets/js/questions/welcomeQuestions');
-const addDepartmentQuestions = require('./assets/js/questions/addDepartmentQuestions');
-const addEmployeeQuestions = require('./assets/js/questions/addEmployeeQuestions');
-const addRoleQuestions = require('./assets/js/questions/addRoleQuestions');
-const updateRoleQuestions = require('./assets/js/questions/updateRoleQuestions');
-
-// CONNECTION =========================================
-// (i) initialise global variables so I can use and export the tables from MySQL -----------------------------------------
+// (ii) tables from MySQL
 let roleTable;
 let departmentTable;
 let employeeTable;
 
-// (ii) create connection to database -----------------------------------------
+// (ii) question arrays -----------------------------------------
+const welcomeQuestions = { type: "list", message: "Welcome to Employee Tracker. What would you like to do?", name: "welcomeChoices", choices: [{ name: "View all employees", value: "viewEmployees" }, { name: "View all departments", value: "viewDepartments" }, { name: "View all roles", value: "viewRoles" }, { name: "Add employee", value: "addEmployee" }, { name: "Add department", value: "addDept" }, { name: "Add role", value: "addRole" }, { name: "Update role", value: "updateRole" }, { name: "Quit", value: "quit" }] }
+const updateRoleQuestions = [{ type: "list", message: "For which employee would you like to update the role?", name: "empID", choices: employeeTable }, { type: "list", message: "What is the employee's new role?", name: "titleID", choices: roleTable }];
+const addRoleQuestions = [{ type: "input", message: "What is the name of the new employee role?", name: "title" }, { type: "input", message: "How much is the salary of the new role?", name: "salary" }, { type: "list", message: "In which department is the new role?", name: "id", choices: departmentTable }];
+const addEmployeeQuestions = [{ type: 'input', message: "What is the employee's first name?", name: "firstName", }, { type: "input", message: "What is the employee's last name?", name: "lastName", }, { type: "list", message: "What is the employee's title?", name: "title", choices: roleTable }, { type: "list", message: "Who is the employee's manager?", name: "manager", choices: employeeTable }];
+const addDepartmentQuestions = { type: "input", message: "What is the name of the new department?", name: "name" };
+
+
+// CONNECTION =========================================
+// (i) create connection to database -----------------------------------------
 const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -32,7 +26,7 @@ const connection = mysql.createConnection({
     database: 'employeesDB',
 })
 
-// (iii) initialise MySQL connection -----------------------------------------
+// (ii) initialise MySQL connection -----------------------------------------
 // This also populates the showRoles/showDepartments/showEmployees global variables with the tables from MySQL
 connection.connect((err) => {
 
@@ -181,14 +175,3 @@ const endConnection = () => {
     connection.end();
     process.exit();
 }
-
-
-// EXPORTS =========================================
-// (i) an Object populated with the table variables made earlier so that the files in "./assets/js/questions/" can use them.
-const tableObj = {
-    roles: roleTable,
-    departments: departmentTable,
-    employees: employeeTable
-}
-
-module.exports = tableObj;
