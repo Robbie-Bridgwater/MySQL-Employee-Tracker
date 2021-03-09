@@ -4,7 +4,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql');
 
 // (ii) tables from MySQL
-let roleTable;
+var roleTable;
 let departmentTable;
 let employeeTable;
 
@@ -35,14 +35,14 @@ connection.connect((err) => {
 
     console.log("connected as ID " + connection.threadId);
 
-    connection.query("SELECT * from role", (err, res) => {
-        roleTable = res.map(role => ({ name: role.title, value: role.id }))
+    connection.query("SELECT * FROM role", (err, response) => {
+        roleTable = response.map(role => ({ name: role.title, value: role.id }))
     })
-    connection.query("SELECT * from department", (err, res) => {
-        departmentTable = res.map(department => ({ name: department.name, value: department.id }))
+    connection.query("SELECT * FROM department", (err, response) => {
+        departmentTable = response.map(department => ({ name: department.name, value: department.id }))
     })
-    connection.query("SELECT * from employee", (err, res) => {
-        employeeTable = res.map(employee => ({ name: `${employee.first_name} ${employee.last_name}`, value: employee.id }))
+    connection.query("SELECT * FROM employee", (err, response) => {
+        employeeTable = response.map(employee => ({ name: `${employee.first_name} ${employee.last_name}`, value: employee.id }))
     })
 
     welcomePrompt(welcomeQuestions)
